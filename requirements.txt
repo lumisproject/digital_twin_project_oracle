@@ -1,0 +1,7 @@
+tree-sitter-language-pack
+python-dotenv
+GitPython
+networkx
+sentence-transformers
+torch
+openai
