@@ -61,7 +61,7 @@ def ask_twin(query):
     full_context_str = ""
     for u in context_units:
         unit_info = f"File/Unit: {u['id']}\nSummary: {u['summary']}"
-        # Add the 'Trace' information
+
         relationship_info = get_graph_context(u['id'], graph)
         full_context_str += unit_info + relationship_info + "\n\n"
 
