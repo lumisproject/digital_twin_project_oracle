@@ -52,18 +52,17 @@ def get_graph_context(node_id, G):
 
 def ask_twin(query):
     memory, graph = load_knowledge()
-    if not memory: return
 
     # 1. Semantic Search
     context_units = find_context(query, memory)
     
     # 2. Build Context with Graph Traces
-    full_context_str = ""
+    full_context = ""
     for u in context_units:
         unit_info = f"File/Unit: {u['id']}\nSummary: {u['summary']}"
 
         relationship_info = get_graph_context(u['id'], graph)
-        full_context_str += unit_info + relationship_info + "\n\n"
+        full_context += unit_info + relationship_info + "\n\n"
 
     # 3. Prompting
     system_prompt = (
@@ -72,7 +71,7 @@ def ask_twin(query):
         "Pay attention to how functions call each other to explain the impact of changes."
     )
     
-    user_prompt = f"Context from codebase:\n{full_context_str}\n\nQuestion: {query}"
+    user_prompt = f"Context from codebase:\n{full_context}\n\nQuestion: {query}"
 
     return get_llm_completion(system_prompt, user_prompt)
 

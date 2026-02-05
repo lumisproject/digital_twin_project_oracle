@@ -19,7 +19,6 @@ TEMP_PATH = "temp_project"
 def run_lumis(repo_url):
     print(f"🚀 Running Non-Destructive Update for: {repo_url}")
     
-    # 1. LOAD EXISTING MEMORY (Don't delete!)
     mem_dict = {}
     last_commit = "initial"
     
@@ -27,7 +26,6 @@ def run_lumis(repo_url):
         print("📂 Loading existing memory...")
         with open(MEMORY_FILE, "r") as f:
             old_data = json.load(f)
-            # Metadata is at index 0, actual units follow
             if old_data and "last_commit" in old_data[0]:
                 last_commit = old_data[0]["last_commit"]
                 mem_dict = {item["id"]: item for item in old_data[1:]}
@@ -47,7 +45,6 @@ def run_lumis(repo_url):
 
     # 3. Process and Merge
     G = nx.DiGraph()
-    
     for root, _, files in os.walk(TEMP_PATH):
         if ".git" in root: continue
         for file in files:
@@ -62,10 +59,7 @@ def run_lumis(repo_url):
                 current_hash = generate_footprint(unit["code"])
                 
                 # Check if we already have this exact code summarized
-                if node_id in mem_dict and mem_dict[node_id].get("footprint") == current_hash:
-                    # KEEP OLD DATA - Do nothing
-                    pass 
-                else:
+                if not (node_id in mem_dict and mem_dict[node_id].get("footprint") == current_hash):
                     print(f"✨ New or changed: {node_id}")
                     intel = enrich_block(unit["code"], unit["name"])
                     if intel:
