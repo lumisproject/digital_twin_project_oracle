@@ -1,25 +1,20 @@
 import os
+import hashlib
 from openai import OpenAI
 from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# API configuration
 client = OpenAI(
     base_url="https://openrouter.ai/api/v1",
     api_key=os.getenv("OPEN_ROUTER"),
 )
 
-# The embedding model is loaded into memory once
+# Load once, use everywhere
 embed_model = SentenceTransformer('all-MiniLM-L6-v2')
 
-def get_embedding(text):
-    """Generates a vector for any given text."""
-    return embed_model.encode(text).tolist()
-
 def get_llm_completion(system_prompt, user_prompt, temperature=0.2):
-    """Standard wrapper for OpenRouter API calls."""
     try:
         completion = client.chat.completions.create(
             extra_body={"reasoning": {"enabled": True}},
@@ -32,5 +27,12 @@ def get_llm_completion(system_prompt, user_prompt, temperature=0.2):
         )
         return completion.choices[0].message.content.strip()
     except Exception as e:
-        print(f"Service Error: {e}")
+        print(f"LLM Error: {e}")
         return None
+
+def get_embedding(text):
+    return embed_model.encode(text).tolist()
+
+def generate_footprint(text):
+    """Creates a unique SHA-256 hash for a string of code."""
+    return hashlib.sha256(text.encode('utf-8')).hexdigest()

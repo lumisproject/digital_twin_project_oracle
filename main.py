@@ -1,88 +1,99 @@
 import os
 import json
-import shutil
 import networkx as nx
 from networkx.readwrite import json_graph
 from git import Repo
-from src.ingestor import get_code_data, enrich_block
+from dotenv import load_dotenv
 
-# CONFIGURATION
+# Import shared logic
+from src.ingestor import get_code_data, enrich_block
+from src.services import generate_footprint
+
+load_dotenv()
+
 MEMORY_DIR = "memory"
 MEMORY_FILE = os.path.join(MEMORY_DIR, "lumis_memory.json")
 GRAPH_FILE = os.path.join(MEMORY_DIR, "lumis_graph.json")
 TEMP_PATH = "temp_project"
 
 def run_lumis(repo_url):
-    print(f"🚀 Initializing Lumis Engine for: {repo_url}")
+    print(f"🚀 Running Non-Destructive Update for: {repo_url}")
     
-    # 1. Clean & Clone
-    if os.path.exists(TEMP_PATH):
-        print("Cleaning up old workspace...")
-        try:
-            shutil.rmtree(TEMP_PATH)
-        except Exception as e:
-            print(f"Cleanup Warning: {e}")
+    # 1. LOAD EXISTING MEMORY (Don't delete!)
+    mem_dict = {}
+    last_commit = "initial"
     
-    print("Cloning repository (shallow)...")
-    Repo.clone_from(repo_url, TEMP_PATH, depth=1)
+    if os.path.exists(MEMORY_FILE):
+        print("📂 Loading existing memory...")
+        with open(MEMORY_FILE, "r") as f:
+            old_data = json.load(f)
+            # Metadata is at index 0, actual units follow
+            if old_data and "last_commit" in old_data[0]:
+                last_commit = old_data[0]["last_commit"]
+                mem_dict = {item["id"]: item for item in old_data[1:]}
+            else:
+                mem_dict = {item["id"]: item for item in old_data}
 
-    G = nx.DiGraph()
-    full_memory = []
+    # 2. Update/Clone Repo
+    if not os.path.exists(TEMP_PATH):
+        print("Cloning repository...")
+        repo = Repo.clone_from(repo_url, TEMP_PATH, depth=1)
+    else:
+        print("Pulling latest updates...")
+        repo = Repo(TEMP_PATH)
+        repo.remotes.origin.pull()
     
-    # 2. Ingest & Process
-    print("Extracting code units and generating summaries...")
+    new_commit = repo.head.commit.hexsha
+
+    # 3. Process and Merge
+    G = nx.DiGraph()
+    
     for root, _, files in os.walk(TEMP_PATH):
         if ".git" in root: continue
         for file in files:
-            file_path = os.path.join(root, file)
-            rel_path = os.path.relpath(file_path, TEMP_PATH)
+            if not file.endswith(('.py', '.js', '.ts', '.rs')): continue
             
-            # Identify functions/classes via Tree-sitter
-            code_units = get_code_data(file_path)
+            f_path = os.path.join(root, file)
+            rel_path = os.path.relpath(f_path, TEMP_PATH)
             
-            for unit in code_units:
-                # Get LLM intelligence (Summary + Embeddings)
-                intel = enrich_block(unit['code'])
+            units = get_code_data(f_path)
+            for unit in units:
+                node_id = f"{rel_path}::{unit['name']}"
+                current_hash = generate_footprint(unit["code"])
                 
-                if intel:
-                    node_id = f"{rel_path}::{unit['name']}"
-                    
-                    # Add to JSON Memory
-                    full_memory.append({
-                        "id": node_id,
-                        "file_path": rel_path,
-                        "summary": intel["summary"],
-                        "embedding": intel["embedding"]
-                    })
-                    
-                    # Add to Relationship Graph
-                    G.add_node(node_id, summary=intel["summary"])
-                    for call in unit['calls']:
+                # Check if we already have this exact code summarized
+                if node_id in mem_dict and mem_dict[node_id].get("footprint") == current_hash:
+                    # KEEP OLD DATA - Do nothing
+                    pass 
+                else:
+                    print(f"✨ New or changed: {node_id}")
+                    intel = enrich_block(unit["code"], unit["name"])
+                    if intel:
+                        mem_dict[node_id] = {
+                            "id": node_id,
+                            "file_path": rel_path,
+                            **intel,
+                            "calls": unit["calls"]
+                        }
+                
+                # Rebuild Graph from memory
+                if node_id in mem_dict:
+                    data = mem_dict[node_id]
+                    G.add_node(node_id, summary=data["summary"])
+                    for call in data.get("calls", []):
                         G.add_edge(node_id, call)
-    # Final step: Cleanup
-    print("Cleaning up temporary files...")
-    if os.path.exists(TEMP_PATH):
-        try:
-            shutil.rmtree(TEMP_PATH)
-            print("Temp workspace cleared.")
-        except Exception as e:
-            print(f"Cleanup failed: {e}")
 
-    # 3. Persistence
-    if not os.path.exists(MEMORY_DIR):
-        os.makedirs(MEMORY_DIR)
-
+    # 4. Save Final Merged Result
+    os.makedirs(MEMORY_DIR, exist_ok=True)
+    final_output = [{"last_commit": new_commit}] + list(mem_dict.values())
+    
     with open(MEMORY_FILE, "w") as f:
-        json.dump(full_memory, f, indent=4)
+        json.dump(final_output, f, indent=4)
             
     with open(GRAPH_FILE, "w") as f:
         json.dump(json_graph.node_link_data(G), f, indent=4)
     
-    print("-" * 30)
-    print(f"✅ Digital Twin Build Complete.")
-    print(f"Stored {len(full_memory)} units in {MEMORY_FILE}")
+    print(f"✅ Update Complete. {len(mem_dict)} units now in memory.")
 
 if __name__ == "__main__":
-    TARGET_REPO = "https://github.com/racemdammak/cstam-final"
-    run_lumis(TARGET_REPO)
-    os.remove("temp_project")
+    run_lumis(os.getenv("REPO_URL"))
