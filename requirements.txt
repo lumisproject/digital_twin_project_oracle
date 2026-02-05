@@ -5,3 +5,4 @@ networkx
 sentence-transformers
 torch
 openai
+Flask

@@ -4,1086 +4,206 @@
     "graph": {},
     "nodes": [
         {
-            "summary": "This function, `upload_image`, is a Flask or FastAPI endpoint that handles asynchronous image uploads, decodes the base64 image data, saves it to a file, runs a prediction on the image, and returns the result as a JSON response.",
-            "id": "api\\main.py::upload_image"
+            "summary": "The heuristic function calculates the Manhattan distance between two points to estimate the cost in grid-based pathfinding algorithms like A*.",
+            "id": "main.py::heuristic"
         },
         {
-            "id": "open(filepath, \"wb\")"
+            "id": "abs(a[1] - b[1])"
         },
         {
-            "id": "ValueError(\"Invalid image format\")"
+            "id": "abs(a[0] - b[0])"
         },
         {
-            "id": "request.image.split(',')"
+            "summary": "The astar function finds the shortest path from start to goal on a grid with obstacles using the A* search algorithm, which efficiently explores nodes by combining actual path cost with a heuristic estimate to prioritize exploration.",
+            "id": "main.py::astar"
         },
         {
-            "id": "f.write(image_data)"
+            "id": "set()"
         },
         {
-            "id": "base64.b64decode(parts[1])"
+            "id": "heapq.heappush(open_set, (0, start))"
         },
         {
-            "id": "print(f\"Received image request: {request.image[:100]}...\")"
+            "id": "heuristic(start, goal)"
         },
         {
-            "id": "datetime.now().strftime(\"%Y%m%d_%H%M%S\")"
+            "id": "reconstruct_path(came_from, current)"
         },
         {
-            "id": "datetime.now()"
+            "id": "heapq.heappop(open_set)"
         },
         {
-            "id": "print(f\"Image saved to {filepath}\")"
+            "id": "heuristic(neighbor, goal)"
         },
         {
-            "id": "len(parts)"
+            "id": "len(grid)"
         },
         {
-            "id": "print(f\"Upload error: {e}\")"
+            "id": "closed_set.add(current)"
         },
         {
-            "id": "HTTPException(status_code=400, detail=str(e))"
+            "id": "heapq.heappush(open_set, (f_score[neighbor], neighbor))"
         },
         {
-            "id": "str(e)"
+            "id": "len(grid[0])"
         },
         {
-            "id": "os.makedirs(upload_dir, exist_ok=True)"
+            "summary": "The function reconstructs a path from the start node to the current node by backtracking through the `came_from` dictionary of predecessors and reversing the collected nodes.",
+            "id": "main.py::reconstruct_path"
         },
         {
-            "id": "predict_meal(filepath)"
+            "id": "path.append(current)"
         },
         {
-            "id": "os.path.join(upload_dir, filename)"
+            "summary": "The function visualizes and prints a grid by converting cells with value 1 to obstacles (#) and optionally overlaying a specified path with asterisks (*).",
+            "id": "main.py::print_grid"
         },
         {
-            "summary": "The logic in this function is to asynchronously retrieve food data from a local JSON file, handle potential file not found and other exceptions by logging the error and raising a 400 HTTP exception.",
-            "id": "api\\main.py::get_food_data"
+            "id": "print(\" \".join(row))"
         },
         {
-            "id": "FileNotFoundError(\"Food data file not found\")"
+            "id": "range(len(grid[0]))"
         },
         {
-            "id": "print(f\"Food data retrieval error: {e}\")"
+            "id": "\" \".join(row)"
         },
         {
-            "id": "os.path.exists(food_data_file)"
+            "id": "range(len(grid))"
         },
         {
-            "id": "print(\"Fetching food data...\")"
+            "summary": "The hello function prints a greeting and a brief introduction to an A* pathfinding algorithm implementation.",
+            "id": "main.py::hello"
         },
         {
-            "id": "f.read()"
+            "id": "print(\"This is a simple implementation of the A* algorithm in Python.\")"
         },
         {
-            "id": "open(food_data_file, \"r\")"
+            "id": "print(\"Hello, A* Pathfinding!\")"
         },
         {
-            "summary": "This function uses a YOLO model to detect food items in an image, extracts nutrition information from a database, and returns a dictionary containing the detected items, total nutrition values, and a generated meal name and suggestion.",
-            "id": "api\\model.py::detect_meals"
+            "summary": "The main function configures a grid with obstacles, defines start and goal coordinates, invokes the A* pathfinding algorithm with orthogonal movement restrictions, and prints whether a path was found.",
+            "id": "main.py::main"
         },
         {
-            "id": "float(box.conf[0])"
+            "id": "print(\"No path found.\")"
         },
         {
-            "id": "detected_items.append({\r\n                    \"name\": food_data[\"name\"],\r\n                    \"confidence\": confidence,\r\n                    \"calories\": food_data[\"calories\"],\r\n                    \"protein\": food_data[\"protein\"],\r\n                    \"carbs\": food_data[\"carbs\"],\r\n                    \"fat\": food_data[\"fat\"]\r\n                })"
+            "id": "print_grid(grid, path)"
         },
         {
-            "id": "int(box.cls[0])"
+            "id": "astar(grid, start, goal, allow_diagonal=False)"
         },
         {
-            "id": "generate_suggestion(total_calories, total_protein, total_carbs, total_fat)"
+            "id": "hello()"
         },
         {
-            "id": "generate_meal_name(detected_items)"
-        },
-        {
-            "id": "model(image)"
-        },
-        {
-            "summary": "The function `generate_meal_name(items)` generates a meal name based on the provided items, returning the single item name if there's only one item, and a string of the first two item names joined by \" with \" otherwise.",
-            "id": "api\\model.py::generate_meal_name"
-        },
-        {
-            "id": "\" with \".join(item_names[:2])"
-        },
-        {
-            "id": "len(item_names)"
-        },
-        {
-            "summary": "This function generates a nutrition suggestion based on the input calories, protein, carbs, and fat, but it does not utilize the protein, carbs, and fat parameters, making them redundant.",
-            "id": "api\\model.py::generate_suggestion"
-        },
-        {
-            "id": "suggestions.append(\"This is a light meal. Consider adding more protein or healthy carbs.\")"
-        },
-        {
-            "id": "suggestions.append(\"Well-balanced meal! Good nutrition for your body.\")"
-        },
-        {
-            "id": "\" \".join(suggestions)"
-        },
-        {
-            "id": "suggestions.append(\"This is a hearty meal! Great for replenishing energy.\")"
-        },
-        {
-            "summary": "The function `predict_meal` uses a machine learning model to detect meal items from an image, extracts the detected items along with their confidence levels, and returns them as a list of dictionaries.",
-            "id": "api\\predict.py::predict_meal"
-        },
-        {
-            "id": "detected_items.append({\r\n                \"item\": class_name,\r\n                \"confidence\": round(confidence, 2)\r\n            })"
-        },
-        {
-            "id": "print(f\"\u2705 Detection done!\")"
-        },
-        {
-            "id": "box.cls.item()"
-        },
-        {
-            "id": "int(box.cls.item())"
-        },
-        {
-            "id": "print(f\"\ud83d\udd0d Running detection on: {image_path}\")"
-        },
-        {
-            "id": "box.conf.item()"
-        },
-        {
-            "id": "print(f\"\u274c Prediction failed: {e}\")"
-        },
-        {
-            "id": "model.predict(source=image_path, conf=0.5, save=True)"
-        },
-        {
-            "id": "round(confidence, 2)"
-        },
-        {
-            "summary": "This is an implementation of the Singleton design pattern in Python, which ensures that only one instance of the class is created throughout the program's execution.",
-            "id": "chatbot\\agent.py::__new__"
-        },
-        {
-            "id": "super(Agent, cls).__new__(cls, *args, **kwargs)"
-        },
-        {
-            "id": "super(Agent, cls)"
-        },
-        {
-            "summary": "This code snippet appears to be a class initializer (`__init__` method) that checks if the object has already been initialized. If it has, the method returns immediately without executing the rest of the code. If not, it sets a flag to indicate initialization and then initializes several class attributes, including a client object and a retriever object. \n\nHowever, there seems to be a potential issue with this code. The `self._initialized` flag is set to `True` regardless of whether the object has already been initialized or not. This means that once the object has been initialized, it will never be reinitialized, even if the object is recreated or reloaded. \n\nA more typical implementation of this pattern would be to use a flag that is set to `False` initially and then set to `True` after initialization, like this:\n\n```python\ndef __init__(self):\n    if hasattr(self, '_initialized') and self._initialized:\n        return\n    self._initialized = True\n    # initialization code here\n```\n\nThis way, the object can be reinitialized if it is recreated or reloaded.",
-            "id": "chatbot\\agent.py::__init__"
-        },
-        {
-            "id": "hasattr(self, '_initialized')"
-        },
-        {
-            "id": "os.getenv(\"GROQ_API_KEY\")"
-        },
-        {
-            "id": "groq.Client(api_key=os.getenv(\"GROQ_API_KEY\"))"
-        },
-        {
-            "summary": "This code defines an asynchronous method `start_server` that starts a WebSocket server on `localhost:8765`, handles incoming connections with the `handle_connection` method, and keeps the server running indefinitely.",
-            "id": "chatbot\\agent.py::start_server"
-        },
-        {
-            "id": "asyncio.Future()"
-        },
-        {
-            "id": "print(\"WebSocket server started on ws://localhost:8765\")"
-        },
-        {
-            "id": "websockets.serve(\r\n            self.handle_connection,\r\n            \"localhost\",\r\n            8765,\r\n            ping_interval=3600,\r\n            ping_timeout=3600\r\n        )"
-        },
-        {
-            "summary": "This code defines an asynchronous generator function `lifespan` that manages the startup and shutdown of a FastAPI application by establishing a persistent connection with an AI agent via WebSocket.",
-            "id": "chatbot\\main.py::lifespan"
-        },
-        {
-            "id": "websockets.connect(\r\n            AGENT_WS_URL,\r\n            ping_interval=3600,\r\n            ping_timeout=3600\r\n        )"
-        },
-        {
-            "id": "print(\"\ud83d\udd0c Agent connection closed\")"
-        },
-        {
-            "id": "print(\"\u2705 Connected to Agent WebSocket\")"
-        },
-        {
-            "id": "print(\"\ud83d\udd17 Connecting to Agent WebSocket...\")"
-        },
-        {
-            "id": "print(f\"\u274c Failed to connect to Agent: {e}\")"
-        },
-        {
-            "id": "agent_ws.close()"
-        },
-        {
-            "summary": "This code defines an asynchronous function named `root` using the FastAPI framework, which returns a JSON object containing a success message when the root endpoint of the server is accessed.",
-            "id": "chatbot\\main.py::root"
-        },
-        {
-            "summary": "This code defines an asynchronous WebSocket endpoint that acts as a bridge between a frontend WebSocket and an AI Agent WebSocket, forwarding messages between the two and handling disconnections and errors.",
-            "id": "chatbot\\main.py::websocket_endpoint"
-        },
-        {
-            "id": "print(f\"\u26a0\ufe0f Error: {e}\")"
-        },
-        {
-            "id": "print(\"\u274c Client disconnected.\")"
-        },
-        {
-            "id": "agent_ws.send(user_message)"
-        },
-        {
-            "id": "print(\"\ud83d\udd0c New WebSocket connection from client...\")"
-        },
-        {
-            "id": "print(f\"\ud83e\udd16 Agent replies: {ai_reply}\")"
-        },
-        {
-            "id": "websocket.accept()"
-        },
-        {
-            "id": "websocket.receive_text()"
-        },
-        {
-            "id": "websocket.send_text(ai_reply)"
-        },
-        {
-            "id": "print(f\"\ud83d\udc64 Client says: {user_message}\")"
-        },
-        {
-            "id": "websocket.send_text(f\"Error: {str(e)}\")"
-        },
-        {
-            "id": "websocket.close()"
-        },
-        {
-            "id": "websocket.send_text(\"\u274c Agent is not connected. Please try again later.\")"
-        },
-        {
-            "id": "agent_ws.recv()"
-        },
-        {
-            "summary": "This function takes a list of documents and splits each document's text into chunks of a specified size with a specified overlap, then returns a list of dictionaries containing the original document metadata and the corresponding chunk of text.",
-            "id": "chatbot\\processing\\chunker.py::chunk_documents"
-        },
-        {
-            "id": "splitter.split_text(doc[\"text\"])"
-        },
-        {
-            "id": "RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)"
-        },
-        {
-            "id": "doc.get(\"sections\", [])"
-        },
-        {
-            "id": "enumerate(texts)"
-        },
-        {
-            "id": "chunks.append({\r\n                \"title\": doc.get(\"title\", \"\"),\r\n                \"sections\": doc.get(\"sections\", []),\r\n                \"text\": chunk,\r\n                \"source\": doc[\"source\"],\r\n                \"page\": doc[\"page\"],\r\n                \"chunk_id\": i\r\n            })"
-        },
-        {
-            "id": "doc.get(\"title\", \"\")"
-        },
-        {
-            "summary": "This function embeds chunks of text into a numerical vector space using a pre-trained Sentence-BERT model, adding the resulting embeddings to each chunk as a list of floats.",
-            "id": "chatbot\\processing\\embedder.py::embed_chunks"
-        },
-        {
-            "id": "print(\"\ud83d\udd04 Generating embeddings...\")"
-        },
-        {
-            "id": "enumerate(chunks)"
-        },
-        {
-            "id": "model.encode(texts, show_progress_bar=True, convert_to_numpy=True)"
-        },
-        {
-            "id": "SentenceTransformer(model_name)"
-        },
-        {
-            "id": "embeddings[i].tolist()"
-        },
-        {
-            "summary": "The function `retrieve_chunks` uses a vector database to search for the most relevant chunks to a given query string, returning the top `top_k` matching chunks along with their metadata.",
-            "id": "chatbot\\processing\\retriever.py::retrieve_chunks"
-        },
-        {
-            "id": "model.encode([query])"
-        },
-        {
-            "id": "len(metadata)"
-        },
-        {
-            "id": "results.append(metadata[i])"
-        },
-        {
-            "id": "index.search(query_embedding, top_k)"
-        },
-        {
-            "id": "model.encode([query]).astype(\"float32\")"
-        },
-        {
-            "summary": "This function extracts text from a PDF file at each non-empty page, storing the source, text, and page number in a list of dictionaries.",
-            "id": "chatbot\\utils\\pdf_parser.py::extract_text_from_pdf"
-        },
-        {
-            "id": "pages.append({\r\n                \"source\": f\"{file_path}#page={page_num + 1}\",\r\n                \"text\": text.strip(),\r\n                \"page\": page_num + 1\r\n            })"
-        },
-        {
-            "id": "range(len(doc))"
-        },
-        {
-            "id": "len(doc)"
-        },
-        {
-            "id": "page.get_text(\"text\")"
-        },
-        {
-            "id": "text.strip()"
-        },
-        {
-            "id": "fitz.open(file_path)"
-        },
-        {
-            "summary": "The given function `ensure_file_exists` checks if a file exists at the specified path. If the file does not exist, it raises a `FileNotFoundError` with a message indicating the non-existent file path. \n\nHowever, this function does not actually create the file if it does not exist. It only checks for its existence. To create the file if it does not exist, the function would need to be modified to include a file creation operation, such as `open(path, 'w').close()` or `with open(path, 'w') as f: pass`. \n\nHere's a revised version of the function that creates the file if it does not exist:\n\n```python\nimport os\n\ndef ensure_file_exists(path: str):\n    if not os.path.isfile(path):\n        with open(path, 'w') as f:\n            pass\n    elif not os.path.exists(os.path.dirname(path)):\n        os.makedirs(os.path.dirname(path))\n```\n\nThis revised function creates the file if it does not exist and also creates the directory if it does not exist.",
-            "id": "chatbot\\utils\\system_utils.py::ensure_file_exists"
-        },
-        {
-            "id": "FileNotFoundError(f\"\u274c File not found: {path}\")"
-        },
-        {
-            "id": "os.path.isfile(path)"
-        },
-        {
-            "summary": "The function `ensure_directory_exists` checks if a given directory path exists, and if not, it creates the directory with the `exist_ok=True` parameter to prevent raising an error if the path already exists.",
-            "id": "chatbot\\utils\\system_utils.py::ensure_directory_exists"
-        },
-        {
-            "id": "os.path.isdir(path)"
-        },
-        {
-            "id": "print(f\"Creating extraction directory: {path}\")"
-        },
-        {
-            "id": "print(f\"Using existing extraction directory: {path}\")"
-        },
-        {
-            "id": "os.makedirs(path, exist_ok=True)"
-        },
-        {
-            "summary": "This function builds a Faiss Index using the provided embeddings, which are expected to be a 2D NumPy array where each row represents a vector in the embedding space.",
-            "id": "chatbot\\utils\\vector_db_utils.py::build_faiss_index"
-        },
-        {
-            "id": "index.add(embeddings)"
-        },
-        {
-            "id": "faiss.IndexFlatL2(dim)"
-        },
-        {
-            "summary": "This function saves a FAISS index and its corresponding metadata to disk, utilizing the FAISS library for efficient similarity search in high-dimensional spaces.",
-            "id": "chatbot\\utils\\vector_db_utils.py::save_faiss_index"
-        },
-        {
-            "id": "open(metadata_path, \"w\", encoding=\"utf-8\")"
-        },
-        {
-            "id": "print(f\"\ud83d\udcdd Saved metadata to: {metadata_path}\")"
-        },
-        {
-            "id": "faiss.write_index(index, index_path)"
-        },
-        {
-            "id": "print(f\"\u2705 Saved FAISS index to: {index_path}\")"
-        },
-        {
-            "id": "os.path.dirname(index_path)"
-        },
-        {
-            "id": "build_faiss_index(embeddings)"
-        },
-        {
-            "id": "np.array([chunk[\"embedding\"] for chunk in chunks])"
-        },
-        {
-            "id": "os.makedirs(os.path.dirname(index_path), exist_ok=True)"
-        },
-        {
-            "id": "np.array([chunk[\"embedding\"] for chunk in chunks]).astype(\"float32\")"
-        },
-        {
-            "id": "json.dump(metadata, f, ensure_ascii=False, indent=2)"
-        },
-        {
-            "summary": "This function loads a pre-trained FAISS index and its associated metadata from specified file paths, returning both as a tuple.",
-            "id": "chatbot\\utils\\vector_db_utils.py::load_faiss_index"
-        },
-        {
-            "id": "json.load(f)"
-        },
-        {
-            "id": "faiss.read_index(index_path)"
-        },
-        {
-            "id": "open(metadata_path, \"r\", encoding=\"utf-8\")"
-        },
-        {
-            "summary": "This function empties a FAISS index and its associated metadata by creating a new empty index and clearing the metadata file.",
-            "id": "chatbot\\utils\\vector_db_utils.py::empty_faiss_index"
-        },
-        {
-            "id": "print(f\"\ud83d\uddd1\ufe0f Emptied FAISS index: {index_path}\")"
-        },
-        {
-            "id": "print(f\"\ud83d\uddd1\ufe0f Emptied metadata: {metadata_path}\")"
-        },
-        {
-            "id": "json.dump([], f, ensure_ascii=False, indent=2)"
-        },
-        {
-            "summary": "The given function `genId()` generates a unique identifier by incrementing a counter (`count`) modulo the maximum safe integer value, effectively creating a circular counter that wraps around when it reaches the maximum value, and returns it as a string.",
-            "id": "src\\hooks\\use-toast.ts::genId"
-        },
-        {
-            "summary": "This function, `dispatch`, appears to be part of a state management system, where it updates the `memoryState` by passing it through a `reducer` function based on the provided `action`, and then notifies all registered `listeners` of the updated state.",
-            "id": "src\\hooks\\use-toast.ts::dispatch"
-        },
-        {
-            "summary": "This function generates a toast notification with a unique ID, allows for updating and dismissing the toast, and dispatches actions to add the toast to the application state.",
-            "id": "src\\hooks\\use-toast.ts::toast"
-        },
-        {
-            "summary": "This function, `useToast`, appears to be a React hook that manages a toast notification state, allowing it to be updated and dismissed, and returns an object with the current state, the toast notification, and a function to dismiss the toast.",
-            "id": "src\\hooks\\use-toast.ts::useToast"
-        },
-        {
-            "summary": "This function, `cn`, appears to be a utility function that takes a variable number of class values (`ClassValue`) as input, merges them using the `clsx` function, and then merges the result with another value using the `twMerge` function, returning the final merged value.",
-            "id": "src\\lib\\utils.ts::cn"
-        },
-        {
-            "summary": "This function, `authenticate`, is an asynchronous method that uses a promise to authenticate with Google Fit using the Google Identity Services, and resolves or rejects based on the authentication outcome.",
-            "id": "src\\services\\googleFitService.ts::authenticate"
-        },
-        {
-            "summary": "This function, `fetchTodayData`, asynchronously retrieves various Google Fit data (steps, sleep, heart rate, calories, distance, and active minutes) for the current day, aggregates the data, and returns it as a `GoogleFitData` object, throwing an error if authentication is not established or if data fetching fails.",
-            "id": "src\\services\\googleFitService.ts::fetchTodayData"
-        },
-        {
-            "summary": "This function, `fetchData`, is an asynchronous method that retrieves data from the Google Fitness API using the provided data type, start time, and end time, and returns a promise containing an array of data points.",
-            "id": "src\\services\\googleFitService.ts::fetchData"
-        },
-        {
-            "summary": "This function, `aggregateSteps`, takes an array of objects (`points`) as input and returns the sum of the `intVal` property of the first element of the `value` property of each object in the array, defaulting to 0 if any of these properties are missing.",
-            "id": "src\\services\\googleFitService.ts::aggregateSteps"
-        },
-        {
-            "summary": "This function, `aggregateSleep`, calculates the total sleep time in hours from an array of points, where each point contains a value with an integer value that represents the sleep time in minutes.",
-            "id": "src\\services\\googleFitService.ts::aggregateSleep"
-        },
-        {
-            "summary": "This function calculates the average heart rate from an array of points, where each point contains a value with a field named 'fpVal' that represents the heart rate.",
-            "id": "src\\services\\googleFitService.ts::aggregateHeartRate"
-        },
-        {
-            "summary": "This function, `aggregateCalories`, calculates the total calories from an array of points by summing up the `fpVal` property of each point's `value` array, defaulting to 0 if the property is missing or null.",
-            "id": "src\\services\\googleFitService.ts::aggregateCalories"
-        },
-        {
-            "summary": "This function, `aggregateDistance`, calculates the total distance in kilometers by summing up the `fpVal` property of each point's `value` array, and returns the result.",
-            "id": "src\\services\\googleFitService.ts::aggregateDistance"
-        },
-        {
-            "summary": "This function, `aggregateActiveMinutes`, takes an array of objects (`points`) and returns the total number of active minutes by summing up the `intVal` property of the first element in the `value` property of each object in the array, defaulting to 0 if any property is missing.",
-            "id": "src\\services\\googleFitService.ts::aggregateActiveMinutes"
-        },
-        {
-            "summary": "This function, `updateUserData`, asynchronously updates a user's data in a Firestore database with their latest Google Fit data, calculates new scores based on the updated goals, and saves the updated data and scores to the database.",
-            "id": "src\\services\\googleFitService.ts::updateUserData"
-        },
-        {
-            "summary": "The logic in this function calculates a daily score for each goal in the `goals` object based on its current progress, assigning a score of 3 for 76% or higher completion, 2 for 51-75% completion, 1 for 26-50% completion, and 0 for less than 26% completion.",
-            "id": "src\\services\\googleFitService.ts::calculateDailyScores"
-        },
-        {
-            "summary": "This function, `isAuthenticated()`, checks if a user is authenticated by verifying if the `accessToken` property is not null, and returns a boolean value indicating the authentication status.",
-            "id": "src\\services\\googleFitService.ts::isAuthenticated"
-        },
-        {
-            "summary": "This function uses a simulated machine learning model to detect common food items in an image, returning an array of randomly generated meal items with varying portion sizes.",
-            "id": "src\\services\\mealDetectionService.ts::detectFoodItems"
-        },
-        {
-            "summary": "The function `generateMealName` takes an array of `MealItem` objects and returns a string describing the meal, handling cases where there is one, two, or more than two items.",
-            "id": "src\\services\\mealDetectionService.ts::generateMealName"
-        },
-        {
-            "summary": "This function generates a personalized nutrition suggestion based on the provided meal analysis, including calorie balance, protein content, and carbohydrate levels.",
-            "id": "src\\services\\mealDetectionService.ts::generateSuggestion"
-        },
-        {
-            "summary": "This function, `analyzeMealImage`, is an asynchronous function that takes an image data string and an optional description, processes the image to detect food items, calculates their nutritional totals, generates a meal name and suggestion, and returns a `MealAnalysis` object with the results.",
-            "id": "src\\services\\mealDetectionService.ts::analyzeMealImage"
-        },
-        {
-            "summary": "This function, `analyzeMealImageWithYOLO`, is an asynchronous function that analyzes a meal image using the YOLO (You Only Look Once) object detection algorithm, sending the image to a backend API and returning a formatted response with nutritional information and a meal suggestion.",
-            "id": "src\\services\\mealDetectionServiceWithYOLO.ts::analyzeMealImageWithYOLO"
-        },
-        {
-            "summary": "This function, `analyzeMealImageSimulated`, is an asynchronous wrapper that imports and calls another function, `analyzeMealImage`, from a separate module, `mealDetectionService`, to analyze a meal image.",
-            "id": "src\\services\\mealDetectionServiceWithYOLO.ts::analyzeMealImageSimulated"
-        },
-        {
-            "summary": "The function `removeUndefinedValues` uses the `Object.entries` method to iterate over the key-value pairs of the input object, filters out any pairs where the value is `undefined`, and then uses `Object.fromEntries` to create a new object with the remaining key-value pairs.",
-            "id": "src\\services\\userService.ts::removeUndefinedValues"
-        },
-        {
-            "summary": "This function asynchronously creates a user profile document in a Firestore database by merging the provided user data with default fields (uid, createdAt, updatedAt) and removing any undefined values.",
-            "id": "src\\services\\userService.ts::createUserProfile"
-        },
-        {
-            "summary": "This function uses asynchronous programming to retrieve a user's profile from a Firestore database, returning the profile data if the user exists, or null otherwise.",
-            "id": "src\\services\\userService.ts::getUserProfile"
-        },
-        {
-            "summary": "This function asynchronously updates a user's profile in a Firestore database by merging the provided updates with the current user data and adding a timestamp for the update.",
-            "id": "src\\services\\userService.ts::updateUserProfile"
-        },
-        {
-            "summary": "This function, `saveNutritionData`, asynchronously saves user nutrition data to a Firestore database, merging any existing data with the same date.",
-            "id": "src\\services\\userService.ts::saveNutritionData"
-        },
-        {
-            "summary": "This function retrieves nutrition data for a specific user on a given date from a Firestore database, returning the data as a `UserDataset` object if it exists, or `null` otherwise.",
-            "id": "src\\services\\userService.ts::getNutritionData"
-        },
-        {
-            "summary": "This function retrieves all nutrition data for a given user from a Firebase Firestore database, using the Firestore SDK, and returns it as a promise of an array of `UserDataset` objects.",
-            "id": "src\\services\\userService.ts::getAllNutritionData"
-        },
-        {
-            "summary": "This JavaScript code defines a constructor function that initializes a speech synthesis object and calls an `initVoice()` method to set up the voice settings.",
-            "id": "src\\utils\\textToSpeech.ts::constructor"
-        },
-        {
-            "summary": "This function, `initVoice()`, initializes a voice for a text-to-speech synthesizer by attempting to find a preferred female voice, then falling back to the first female voice or the first available voice if none are found.",
-            "id": "src\\utils\\textToSpeech.ts::initVoice"
-        },
-        {
-            "summary": "The logic in this function is to synthesize speech from a given text, applying customizable rate, pitch, and volume options, while handling potential errors and canceling any ongoing speech if the TTS (Text-to-Speech) system is disabled.",
-            "id": "src\\utils\\textToSpeech.ts::speak"
-        },
-        {
-            "summary": "This function, `stop()`, appears to be a method that cancels a sound synthesis process (`this.synth.cancel()`) when called, likely used in a musical or audio context.",
-            "id": "src\\utils\\textToSpeech.ts::stop"
-        },
-        {
-            "summary": "The `toggle()` function toggles the `isEnabled` property of an object, stopping the object if it becomes disabled.",
-            "id": "src\\utils\\textToSpeech.ts::toggle"
-        },
-        {
-            "summary": "This function, `isActive()`, returns a boolean value indicating whether the `synth` object is currently speaking.",
-            "id": "src\\utils\\textToSpeech.ts::isActive"
-        },
-        {
-            "summary": "This function, `getEnabled()`, is a simple getter method that returns the value of the `isEnabled` property of the current object. It appears to be a basic implementation of a property accessor, likely used to provide a read-only interface to the `isEnabled` state.",
-            "id": "src\\utils\\textToSpeech.ts::getEnabled"
+            "id": "print(\"Path found:\")"
         }
     ],
     "edges": [
         {
-            "source": "api\\main.py::upload_image",
-            "target": "open(filepath, \"wb\")"
+            "source": "main.py::heuristic",
+            "target": "abs(a[1] - b[1])"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "ValueError(\"Invalid image format\")"
+            "source": "main.py::heuristic",
+            "target": "abs(a[0] - b[0])"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "request.image.split(',')"
+            "source": "main.py::astar",
+            "target": "set()"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "f.write(image_data)"
+            "source": "main.py::astar",
+            "target": "heapq.heappush(open_set, (0, start))"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "base64.b64decode(parts[1])"
+            "source": "main.py::astar",
+            "target": "heuristic(start, goal)"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "print(f\"Received image request: {request.image[:100]}...\")"
+            "source": "main.py::astar",
+            "target": "reconstruct_path(came_from, current)"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "datetime.now().strftime(\"%Y%m%d_%H%M%S\")"
+            "source": "main.py::astar",
+            "target": "heapq.heappop(open_set)"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "datetime.now()"
+            "source": "main.py::astar",
+            "target": "heuristic(neighbor, goal)"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "print(f\"Image saved to {filepath}\")"
+            "source": "main.py::astar",
+            "target": "len(grid)"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "len(parts)"
+            "source": "main.py::astar",
+            "target": "closed_set.add(current)"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "print(f\"Upload error: {e}\")"
+            "source": "main.py::astar",
+            "target": "heapq.heappush(open_set, (f_score[neighbor], neighbor))"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "HTTPException(status_code=400, detail=str(e))"
+            "source": "main.py::astar",
+            "target": "len(grid[0])"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "str(e)"
+            "source": "main.py::reconstruct_path",
+            "target": "path.append(current)"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "os.makedirs(upload_dir, exist_ok=True)"
+            "source": "main.py::print_grid",
+            "target": "print(\" \".join(row))"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "predict_meal(filepath)"
+            "source": "main.py::print_grid",
+            "target": "len(grid)"
         },
         {
-            "source": "api\\main.py::upload_image",
-            "target": "os.path.join(upload_dir, filename)"
+            "source": "main.py::print_grid",
+            "target": "range(len(grid[0]))"
         },
         {
-            "source": "api\\main.py::get_food_data",
-            "target": "FileNotFoundError(\"Food data file not found\")"
+            "source": "main.py::print_grid",
+            "target": "len(grid[0])"
         },
         {
-            "source": "api\\main.py::get_food_data",
-            "target": "print(f\"Food data retrieval error: {e}\")"
+            "source": "main.py::print_grid",
+            "target": "\" \".join(row)"
         },
         {
-            "source": "api\\main.py::get_food_data",
-            "target": "os.path.exists(food_data_file)"
+            "source": "main.py::print_grid",
+            "target": "range(len(grid))"
         },
         {
-            "source": "api\\main.py::get_food_data",
-            "target": "print(\"Fetching food data...\")"
+            "source": "main.py::hello",
+            "target": "print(\"This is a simple implementation of the A* algorithm in Python.\")"
         },
         {
-            "source": "api\\main.py::get_food_data",
-            "target": "f.read()"
+            "source": "main.py::hello",
+            "target": "print(\"Hello, A* Pathfinding!\")"
         },
         {
-            "source": "api\\main.py::get_food_data",
-            "target": "HTTPException(status_code=400, detail=str(e))"
+            "source": "main.py::main",
+            "target": "print(\"No path found.\")"
         },
         {
-            "source": "api\\main.py::get_food_data",
-            "target": "str(e)"
+            "source": "main.py::main",
+            "target": "print_grid(grid, path)"
         },
         {
-            "source": "api\\main.py::get_food_data",
-            "target": "open(food_data_file, \"r\")"
+            "source": "main.py::main",
+            "target": "astar(grid, start, goal, allow_diagonal=False)"
         },
         {
-            "source": "api\\model.py::detect_meals",
-            "target": "float(box.conf[0])"
+            "source": "main.py::main",
+            "target": "hello()"
         },
         {
-            "source": "api\\model.py::detect_meals",
-            "target": "detected_items.append({\r\n                    \"name\": food_data[\"name\"],\r\n                    \"confidence\": confidence,\r\n                    \"calories\": food_data[\"calories\"],\r\n                    \"protein\": food_data[\"protein\"],\r\n                    \"carbs\": food_data[\"carbs\"],\r\n                    \"fat\": food_data[\"fat\"]\r\n                })"
-        },
-        {
-            "source": "api\\model.py::detect_meals",
-            "target": "int(box.cls[0])"
-        },
-        {
-            "source": "api\\model.py::detect_meals",
-            "target": "generate_suggestion(total_calories, total_protein, total_carbs, total_fat)"
-        },
-        {
-            "source": "api\\model.py::detect_meals",
-            "target": "generate_meal_name(detected_items)"
-        },
-        {
-            "source": "api\\model.py::detect_meals",
-            "target": "model(image)"
-        },
-        {
-            "source": "api\\model.py::generate_meal_name",
-            "target": "\" with \".join(item_names[:2])"
-        },
-        {
-            "source": "api\\model.py::generate_meal_name",
-            "target": "len(item_names)"
-        },
-        {
-            "source": "api\\model.py::generate_suggestion",
-            "target": "suggestions.append(\"This is a light meal. Consider adding more protein or healthy carbs.\")"
-        },
-        {
-            "source": "api\\model.py::generate_suggestion",
-            "target": "suggestions.append(\"Well-balanced meal! Good nutrition for your body.\")"
-        },
-        {
-            "source": "api\\model.py::generate_suggestion",
-            "target": "\" \".join(suggestions)"
-        },
-        {
-            "source": "api\\model.py::generate_suggestion",
-            "target": "suggestions.append(\"This is a hearty meal! Great for replenishing energy.\")"
-        },
-        {
-            "source": "api\\predict.py::predict_meal",
-            "target": "detected_items.append({\r\n                \"item\": class_name,\r\n                \"confidence\": round(confidence, 2)\r\n            })"
-        },
-        {
-            "source": "api\\predict.py::predict_meal",
-            "target": "print(f\"\u2705 Detection done!\")"
-        },
-        {
-            "source": "api\\predict.py::predict_meal",
-            "target": "box.cls.item()"
-        },
-        {
-            "source": "api\\predict.py::predict_meal",
-            "target": "int(box.cls.item())"
-        },
-        {
-            "source": "api\\predict.py::predict_meal",
-            "target": "print(f\"\ud83d\udd0d Running detection on: {image_path}\")"
-        },
-        {
-            "source": "api\\predict.py::predict_meal",
-            "target": "box.conf.item()"
-        },
-        {
-            "source": "api\\predict.py::predict_meal",
-            "target": "print(f\"\u274c Prediction failed: {e}\")"
-        },
-        {
-            "source": "api\\predict.py::predict_meal",
-            "target": "model.predict(source=image_path, conf=0.5, save=True)"
-        },
-        {
-            "source": "api\\predict.py::predict_meal",
-            "target": "round(confidence, 2)"
-        },
-        {
-            "source": "chatbot\\agent.py::__new__",
-            "target": "super(Agent, cls).__new__(cls, *args, **kwargs)"
-        },
-        {
-            "source": "chatbot\\agent.py::__new__",
-            "target": "super(Agent, cls)"
-        },
-        {
-            "source": "chatbot\\agent.py::__init__",
-            "target": "hasattr(self, '_initialized')"
-        },
-        {
-            "source": "chatbot\\agent.py::__init__",
-            "target": "os.getenv(\"GROQ_API_KEY\")"
-        },
-        {
-            "source": "chatbot\\agent.py::__init__",
-            "target": "groq.Client(api_key=os.getenv(\"GROQ_API_KEY\"))"
-        },
-        {
-            "source": "chatbot\\agent.py::start_server",
-            "target": "asyncio.Future()"
-        },
-        {
-            "source": "chatbot\\agent.py::start_server",
-            "target": "print(\"WebSocket server started on ws://localhost:8765\")"
-        },
-        {
-            "source": "chatbot\\agent.py::start_server",
-            "target": "websockets.serve(\r\n            self.handle_connection,\r\n            \"localhost\",\r\n            8765,\r\n            ping_interval=3600,\r\n            ping_timeout=3600\r\n        )"
-        },
-        {
-            "source": "chatbot\\main.py::lifespan",
-            "target": "websockets.connect(\r\n            AGENT_WS_URL,\r\n            ping_interval=3600,\r\n            ping_timeout=3600\r\n        )"
-        },
-        {
-            "source": "chatbot\\main.py::lifespan",
-            "target": "print(\"\ud83d\udd0c Agent connection closed\")"
-        },
-        {
-            "source": "chatbot\\main.py::lifespan",
-            "target": "print(\"\u2705 Connected to Agent WebSocket\")"
-        },
-        {
-            "source": "chatbot\\main.py::lifespan",
-            "target": "print(\"\ud83d\udd17 Connecting to Agent WebSocket...\")"
-        },
-        {
-            "source": "chatbot\\main.py::lifespan",
-            "target": "print(f\"\u274c Failed to connect to Agent: {e}\")"
-        },
-        {
-            "source": "chatbot\\main.py::lifespan",
-            "target": "agent_ws.close()"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "print(f\"\u26a0\ufe0f Error: {e}\")"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "print(\"\u274c Client disconnected.\")"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "agent_ws.send(user_message)"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "print(\"\ud83d\udd0c New WebSocket connection from client...\")"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "print(f\"\ud83e\udd16 Agent replies: {ai_reply}\")"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "websocket.accept()"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "websocket.receive_text()"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "websocket.send_text(ai_reply)"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "print(f\"\ud83d\udc64 Client says: {user_message}\")"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "websocket.send_text(f\"Error: {str(e)}\")"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "str(e)"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "websocket.close()"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "websocket.send_text(\"\u274c Agent is not connected. Please try again later.\")"
-        },
-        {
-            "source": "chatbot\\main.py::websocket_endpoint",
-            "target": "agent_ws.recv()"
-        },
-        {
-            "source": "chatbot\\processing\\chunker.py::chunk_documents",
-            "target": "splitter.split_text(doc[\"text\"])"
-        },
-        {
-            "source": "chatbot\\processing\\chunker.py::chunk_documents",
-            "target": "RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)"
-        },
-        {
-            "source": "chatbot\\processing\\chunker.py::chunk_documents",
-            "target": "doc.get(\"sections\", [])"
-        },
-        {
-            "source": "chatbot\\processing\\chunker.py::chunk_documents",
-            "target": "enumerate(texts)"
-        },
-        {
-            "source": "chatbot\\processing\\chunker.py::chunk_documents",
-            "target": "chunks.append({\r\n                \"title\": doc.get(\"title\", \"\"),\r\n                \"sections\": doc.get(\"sections\", []),\r\n                \"text\": chunk,\r\n                \"source\": doc[\"source\"],\r\n                \"page\": doc[\"page\"],\r\n                \"chunk_id\": i\r\n            })"
-        },
-        {
-            "source": "chatbot\\processing\\chunker.py::chunk_documents",
-            "target": "doc.get(\"title\", \"\")"
-        },
-        {
-            "source": "chatbot\\processing\\embedder.py::embed_chunks",
-            "target": "print(\"\ud83d\udd04 Generating embeddings...\")"
-        },
-        {
-            "source": "chatbot\\processing\\embedder.py::embed_chunks",
-            "target": "enumerate(chunks)"
-        },
-        {
-            "source": "chatbot\\processing\\embedder.py::embed_chunks",
-            "target": "model.encode(texts, show_progress_bar=True, convert_to_numpy=True)"
-        },
-        {
-            "source": "chatbot\\processing\\embedder.py::embed_chunks",
-            "target": "SentenceTransformer(model_name)"
-        },
-        {
-            "source": "chatbot\\processing\\embedder.py::embed_chunks",
-            "target": "embeddings[i].tolist()"
-        },
-        {
-            "source": "chatbot\\processing\\retriever.py::retrieve_chunks",
-            "target": "model.encode([query])"
-        },
-        {
-            "source": "chatbot\\processing\\retriever.py::retrieve_chunks",
-            "target": "len(metadata)"
-        },
-        {
-            "source": "chatbot\\processing\\retriever.py::retrieve_chunks",
-            "target": "results.append(metadata[i])"
-        },
-        {
-            "source": "chatbot\\processing\\retriever.py::retrieve_chunks",
-            "target": "index.search(query_embedding, top_k)"
-        },
-        {
-            "source": "chatbot\\processing\\retriever.py::retrieve_chunks",
-            "target": "model.encode([query]).astype(\"float32\")"
-        },
-        {
-            "source": "chatbot\\utils\\pdf_parser.py::extract_text_from_pdf",
-            "target": "pages.append({\r\n                \"source\": f\"{file_path}#page={page_num + 1}\",\r\n                \"text\": text.strip(),\r\n                \"page\": page_num + 1\r\n            })"
-        },
-        {
-            "source": "chatbot\\utils\\pdf_parser.py::extract_text_from_pdf",
-            "target": "range(len(doc))"
-        },
-        {
-            "source": "chatbot\\utils\\pdf_parser.py::extract_text_from_pdf",
-            "target": "len(doc)"
-        },
-        {
-            "source": "chatbot\\utils\\pdf_parser.py::extract_text_from_pdf",
-            "target": "page.get_text(\"text\")"
-        },
-        {
-            "source": "chatbot\\utils\\pdf_parser.py::extract_text_from_pdf",
-            "target": "text.strip()"
-        },
-        {
-            "source": "chatbot\\utils\\pdf_parser.py::extract_text_from_pdf",
-            "target": "fitz.open(file_path)"
-        },
-        {
-            "source": "chatbot\\utils\\system_utils.py::ensure_file_exists",
-            "target": "FileNotFoundError(f\"\u274c File not found: {path}\")"
-        },
-        {
-            "source": "chatbot\\utils\\system_utils.py::ensure_file_exists",
-            "target": "os.path.isfile(path)"
-        },
-        {
-            "source": "chatbot\\utils\\system_utils.py::ensure_directory_exists",
-            "target": "os.path.isdir(path)"
-        },
-        {
-            "source": "chatbot\\utils\\system_utils.py::ensure_directory_exists",
-            "target": "print(f\"Creating extraction directory: {path}\")"
-        },
-        {
-            "source": "chatbot\\utils\\system_utils.py::ensure_directory_exists",
-            "target": "print(f\"Using existing extraction directory: {path}\")"
-        },
-        {
-            "source": "chatbot\\utils\\system_utils.py::ensure_directory_exists",
-            "target": "os.makedirs(path, exist_ok=True)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::build_faiss_index",
-            "target": "index.add(embeddings)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::build_faiss_index",
-            "target": "faiss.IndexFlatL2(dim)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::save_faiss_index",
-            "target": "open(metadata_path, \"w\", encoding=\"utf-8\")"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::save_faiss_index",
-            "target": "print(f\"\ud83d\udcdd Saved metadata to: {metadata_path}\")"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::save_faiss_index",
-            "target": "faiss.write_index(index, index_path)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::save_faiss_index",
-            "target": "print(f\"\u2705 Saved FAISS index to: {index_path}\")"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::save_faiss_index",
-            "target": "os.path.dirname(index_path)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::save_faiss_index",
-            "target": "build_faiss_index(embeddings)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::save_faiss_index",
-            "target": "np.array([chunk[\"embedding\"] for chunk in chunks])"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::save_faiss_index",
-            "target": "os.makedirs(os.path.dirname(index_path), exist_ok=True)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::save_faiss_index",
-            "target": "np.array([chunk[\"embedding\"] for chunk in chunks]).astype(\"float32\")"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::save_faiss_index",
-            "target": "json.dump(metadata, f, ensure_ascii=False, indent=2)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::load_faiss_index",
-            "target": "json.load(f)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::load_faiss_index",
-            "target": "faiss.read_index(index_path)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::load_faiss_index",
-            "target": "open(metadata_path, \"r\", encoding=\"utf-8\")"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::empty_faiss_index",
-            "target": "print(f\"\ud83d\uddd1\ufe0f Emptied FAISS index: {index_path}\")"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::empty_faiss_index",
-            "target": "open(metadata_path, \"w\", encoding=\"utf-8\")"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::empty_faiss_index",
-            "target": "faiss.IndexFlatL2(dim)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::empty_faiss_index",
-            "target": "os.path.dirname(index_path)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::empty_faiss_index",
-            "target": "print(f\"\ud83d\uddd1\ufe0f Emptied metadata: {metadata_path}\")"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::empty_faiss_index",
-            "target": "os.makedirs(os.path.dirname(index_path), exist_ok=True)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::empty_faiss_index",
-            "target": "faiss.write_index(index, index_path)"
-        },
-        {
-            "source": "chatbot\\utils\\vector_db_utils.py::empty_faiss_index",
-            "target": "json.dump([], f, ensure_ascii=False, indent=2)"
+            "source": "main.py::main",
+            "target": "print(\"Path found:\")"
         }
     ]
 }
