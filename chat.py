@@ -1,84 +1,79 @@
-import json
-import os
-import numpy as np
-import networkx as nx
-from networkx.readwrite import json_graph
 from src.services import get_embedding, get_llm_completion
+from src.db_client import supabase
 
-# Configuration
-MEMORY_FILE = "memory/lumis_memory.json"
-GRAPH_FILE = "memory/lumis_graph.json"
+def get_relevant_context(query, project_id):
+    query_vector = get_embedding(query)
+    
+    params = {
+        "query_embedding": query_vector,
+        "match_threshold": 0.2,
+        "match_count": 10,
+        "filter_project_id": project_id
+    }
+    
+    response = supabase.rpc("match_memory_units", params).execute()
+    return response.data
 
-def load_knowledge():
-    if not os.path.exists(MEMORY_FILE) or not os.path.exists(GRAPH_FILE):
-        print("Error: Memory files not found. Run main.py first.")
-        return None, None
+def get_graph_relationships(unit_name, project_id):
+    # what this unit calls
+    calls = supabase.table("graph_edges")\
+        .select("target_unit_name")\
+        .eq("project_id", project_id)\
+        .eq("source_unit_name", unit_name)\
+        .execute()
+        
+    # what calls this unit
+    called_by = supabase.table("graph_edges")\
+        .select("source_unit_name")\
+        .eq("project_id", project_id)\
+        .eq("target_unit_name", unit_name)\
+        .execute()
+        
+    targets = [item['target_unit_name'] for item in calls.data]
+    sources = [item['source_unit_name'] for item in called_by.data]
     
-    with open(MEMORY_FILE, 'r') as f:
-        memory = json.load(f)
-    with open(GRAPH_FILE, 'r') as f:
-        data = json.load(f)
-        graph = json_graph.node_link_graph(data)
-    
-    return memory, graph
+    return targets, sources
 
-def find_context(query, memory, top_k=3):
-    query_vec = np.array(get_embedding(query))
-    similarities = []
+def ask_twin_supabase(query, project_id):
+    relevant_units = get_relevant_context(query, project_id)
     
-    for unit in memory:
-        if "embedding" not in unit: continue
-        unit_vec = np.array(unit["embedding"])
-        sim = np.dot(query_vec, unit_vec) / (np.linalg.norm(query_vec) * np.linalg.norm(unit_vec))
-        similarities.append((sim, unit))
+    if not relevant_units:
+        return "I couldn't find any relevant code in this project to answer your question."
     
-    similarities.sort(key=lambda x: x[0], reverse=True)
-    return [item[1] for item in similarities[:top_k]]
-
-def get_graph_context(node_id, G):
-    """Explores the neighborhood of a code unit."""
-    if node_id not in G:
-        return ""
-    
-    callers = list(G.predecessors(node_id))
-    callees = list(G.successors(node_id))
-    
-    context = f"\n- Relationships for {node_id}:"
-    if callers:
-        context += f"\n  * Called by: {', '.join(callers)}"
-    if callees:
-        context += f"\n  * Calls these functions: {', '.join(callees)}"
-    return context
-
-def ask_twin(query):
-    memory, graph = load_knowledge()
-
-    # 1. Semantic Search
-    context_units = find_context(query, memory)
-    
-    # 2. Build Context with Graph Traces
+    # build full context with units and relationships
     full_context = ""
-    for u in context_units:
-        unit_info = f"File/Unit: {u['id']}\nSummary: {u['summary']}"
+    for unit in relevant_units:
+        name = unit['unit_name']
+        summary = unit['summary']
+        
+        targets, sources = get_graph_relationships(name, project_id)
+        
+        full_context += f"Function: {name}\nSummary: {summary}\n"
+        if sources:
+            full_context += f"  - Called by: {', '.join(sources)}\n"
+        if targets:
+            full_context += f"  - Calls: {', '.join(targets)}\n"
+        full_context += "\n"
 
-        relationship_info = get_graph_context(u['id'], graph)
-        full_context += unit_info + relationship_info + "\n\n"
-
-    # 3. Prompting
     system_prompt = (
-        "You are Lumis, the Digital Twin of this codebase. "
-        "Use the provided summaries and relationship traces to answer. "
-        "Pay attention to how functions call each other to explain the impact of changes."
+        "You are Lumis, the AI Digital Twin for this software project. "
+        "Your goal is to explain complex code in a clear, architectural, and visually appealing way. "
+        
+        "STRICT FORMATTING RULES:\n"
+        "1. Use Markdown headers (###) for sections.\n"
+        "2. Use **bolding** for function names and variables.\n"
+        "3. Use Mermaid-style flowcharts or structured lists for logic flow.\n"
+        "4. Use Code Blocks (```python) for any code snippets.\n"
+        "5. Use 'Callouts' like '> [!INFO]' or '💡 Tip' to highlight important architectural notes.\n"
+        "6. Keep explanations concise but technically accurate.\n"
+        
+        "Structure your response as follows:\n"
+        "- **Overview**: A 1-sentence summary.\n"
+        "- **Logic Flow**: A numbered list of steps.\n"
+        "- **Component Relationships**: How this block interacts with others (using the provided graph data).\n"
+        "- **Input/Output**: Clear definition of parameters and returns."
     )
     
     user_prompt = f"Context from codebase:\n{full_context}\n\nQuestion: {query}"
-
+    
     return get_llm_completion(system_prompt, user_prompt)
-
-if __name__ == "__main__":
-    print("--- Lumis Digital Twin ---")
-    while True:
-        user_input = input("\nYou: ")
-        if user_input.lower() in ['exit', 'quit']: break
-        print("\nLumis is tracing the graph...")
-        print(f"\nLumis: {ask_twin(user_input)}")

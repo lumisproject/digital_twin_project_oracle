@@ -5,4 +5,6 @@ networkx
 sentence-transformers
 torch
 openai
-Flask
+fastapi[standard]
+supabase
+uvicorn
