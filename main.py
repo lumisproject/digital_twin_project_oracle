@@ -1,93 +1,79 @@
 import os
-import json
-import networkx as nx
-from networkx.readwrite import json_graph
+import shutil
 from git import Repo
 from dotenv import load_dotenv
+from typing import get_args
+import tree_sitter_language_pack as tree
 
-# Import shared logic
 from src.ingestor import get_code_data, enrich_block
 from src.services import generate_footprint
+from src.db_client import supabase, save_memory_unit, save_edges
 
 load_dotenv()
 
-MEMORY_DIR = "memory"
-MEMORY_FILE = os.path.join(MEMORY_DIR, "lumis_memory.json")
-GRAPH_FILE = os.path.join(MEMORY_DIR, "lumis_graph.json")
-TEMP_PATH = "temp_project"
+def run_ingestion_for_user(repo_url, user_id, project_id, status_callback):
+    try:
+        status_callback("Setup", f"Preparing environment...")
+        base_path = "temp_projects"
+        user_project_path = os.path.join(base_path, str(user_id), str(project_id))
+        
+        if os.path.exists(user_project_path):
+            shutil.rmtree(user_project_path)
+        
+        # clone
+        status_callback("Cloning", "Cloning repository...")
+        repo = Repo.clone_from(repo_url, user_project_path, depth=1)
+        new_commit = repo.head.commit.hexsha
 
-def run_lumis(repo_url):
-    print(f"🚀 Running Non-Destructive Update for: {repo_url}")
-    
-    mem_dict = {}
-    last_commit = "initial"
-    
-    if os.path.exists(MEMORY_FILE):
-        print("📂 Loading existing memory...")
-        with open(MEMORY_FILE, "r") as f:
-            old_data = json.load(f)
-            if old_data and "last_commit" in old_data[0]:
-                last_commit = old_data[0]["last_commit"]
-                mem_dict = {item["id"]: item for item in old_data[1:]}
-            else:
-                mem_dict = {item["id"]: item for item in old_data}
+        # supported languages
+        raw_args = get_args(tree.SupportedLanguage)
+        languages = list(raw_args[0].__args__ if raw_args and hasattr(raw_args[0], '__args__') else raw_args)
+        
+        IGNORE_EXT = ('.png', '.jpg', '.jpeg', '.gif', '.exe', '.dll', '.pyc', '.o', '.obj')
+        SKIP_DIRS = {'.git', 'node_modules', '__pycache__', 'venv', '.venv', 'dist', 'build'}
 
-    # 2. Update/Clone Repo
-    if not os.path.exists(TEMP_PATH):
-        print("Cloning repository...")
-        repo = Repo.clone_from(repo_url, TEMP_PATH, depth=1)
-    else:
-        print("Pulling latest updates...")
-        repo = Repo(TEMP_PATH)
-        repo.remotes.origin.pull()
-    
-    new_commit = repo.head.commit.hexsha
+        # analyze
+        status_callback("Analyzing", "Scanning file structure...")
+        
+        all_valid_files = []
+        for root, dirs, files in os.walk(user_project_path):
+            dirs[:] = [d for d in dirs if d not in SKIP_DIRS]
+            for f in files:
+                if f.lower().endswith(IGNORE_EXT): continue
+                all_valid_files.append(os.path.join(root, f))
 
-    # 3. Process and Merge
-    G = nx.DiGraph()
-    for root, _, files in os.walk(TEMP_PATH):
-        if ".git" in root: continue
-        for file in files:
-            if not file.endswith(('.py', '.js', '.ts', '.rs')): continue
+        status_callback("Analyzing", f"Found {len(all_valid_files)} potential source files.")
+
+        for f_path in all_valid_files:
+            rel_path = os.path.relpath(f_path, user_project_path)
+            status_callback("Processing", f"Reading {rel_path}...")
             
-            f_path = os.path.join(root, file)
-            rel_path = os.path.relpath(f_path, TEMP_PATH)
+           # create code units
+            units = get_code_data(f_path, languages)
             
-            units = get_code_data(f_path)
+            if not units: continue
+
             for unit in units:
                 node_id = f"{rel_path}::{unit['name']}"
                 current_hash = generate_footprint(unit["code"])
                 
-                # Check if we already have this exact code summarized
-                if not (node_id in mem_dict and mem_dict[node_id].get("footprint") == current_hash):
-                    print(f"✨ New or changed: {node_id}")
+                # Check Cache
+                existing = supabase.table("memory_units").select("code_footprint").eq("project_id", project_id).eq("unit_name", node_id).execute()
+
+                if not existing.data or existing.data[0]['code_footprint'] != current_hash:
+                    status_callback("Vectorizing", f"Embedding {unit['name']}...")
                     intel = enrich_block(unit["code"], unit["name"])
+                    
                     if intel:
-                        mem_dict[node_id] = {
-                            "id": node_id,
-                            "file_path": rel_path,
-                            **intel,
-                            "calls": unit["calls"]
-                        }
-                
-                # Rebuild Graph from memory
-                if node_id in mem_dict:
-                    data = mem_dict[node_id]
-                    G.add_node(node_id, summary=data["summary"])
-                    for call in data.get("calls", []):
-                        G.add_edge(node_id, call)
+                        data = { "id": node_id, "file_path": rel_path, **intel }
+                        save_memory_unit(project_id, data)
+                        save_edges(project_id, node_id, unit["calls"])
 
-    # 4. Save Final Merged Result
-    os.makedirs(MEMORY_DIR, exist_ok=True)
-    final_output = [{"last_commit": new_commit}] + list(mem_dict.values())
-    
-    with open(MEMORY_FILE, "w") as f:
-        json.dump(final_output, f, indent=4)
-            
-    with open(GRAPH_FILE, "w") as f:
-        json.dump(json_graph.node_link_data(G), f, indent=4)
-    
-    print(f"✅ Update Complete. {len(mem_dict)} units now in memory.")
+        # finalize
+        status_callback("Finalizing", "Updating project metadata...")
+        supabase.table("projects").update({"last_commit": new_commit}).eq("id", project_id).execute()
+        status_callback("DONE", "Ingestion complete.")
 
-if __name__ == "__main__":
-    run_lumis(os.getenv("REPO_URL"))
+    except Exception as e:
+        status_callback("Error", None, str(e))
+        print(f"Ingestion Failed: {e}")
