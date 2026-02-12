@@ -1,4 +1,4 @@
-from fastapi import FastAPI, BackgroundTasks, HTTPException
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from src.db_client import supabase
@@ -94,6 +94,44 @@ async def chat(req: ChatRequest):
         return {"response": response}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/webhook/{user_id}/{project_id}")
+async def github_webhook(user_id: str, project_id: str, request: Request, background_tasks: BackgroundTasks):
+    payload = await request.json()
+    
+    # verify the a push event
+    if "ref" not in payload or "after" not in payload:
+        return {"status": "ignored", "reason": "Not a push event"}
+
+    new_commit_sha = payload["after"]
+    repo_url = payload["repository"]["clone_url"]
+
+    project = supabase.table("projects").select("last_commit").eq("id", project_id).eq("user_id", user_id).single().execute()
+
+    if not project.data:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    # avoid redundant processing if already at this commit
+    if project.data["last_commit"] == new_commit_sha:
+        return {"status": "already_synced"}
+
+    # trigger background incremental sync
+    background_tasks.add_task(
+        run_ingestion_for_user,
+        repo_url,
+        user_id,
+        project_id,
+        lambda step, log=None, err=None: print(f"[{project_id}] {step}: {log or err}")
+    )
+
+    return {"status": "sync_triggered", "commit": new_commit_sha}
+
+@app.get("/")
+def main_page():
+    return {
+        "status": "online",
+        "service": "Lumis Intelligence Orchestrator",
+    }
 
 if __name__ == "__main__":
     import uvicorn

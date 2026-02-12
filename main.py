@@ -4,7 +4,7 @@ from git import Repo
 from dotenv import load_dotenv
 from typing import get_args
 import tree_sitter_language_pack as tree
-
+import stat
 from src.ingestor import get_code_data, enrich_block
 from src.services import generate_footprint
 from src.db_client import supabase, save_memory_unit, save_edges
@@ -16,10 +16,18 @@ def run_ingestion_for_user(repo_url, user_id, project_id, status_callback):
         status_callback("Setup", f"Preparing environment...")
         base_path = "temp_projects"
         user_project_path = os.path.join(base_path, str(user_id), str(project_id))
-        
-        if os.path.exists(user_project_path):
-            shutil.rmtree(user_project_path)
-        
+
+        def remove_readonly(func, path, excinfo):
+            os.chmod(path, stat.S_IWRITE)
+            func(path)
+
+        # Remove the entire temp_projects directory before cloning to free space
+        if os.path.exists(base_path):
+            try:
+                shutil.rmtree(base_path, onerror=remove_readonly)
+            except Exception as e:
+                status_callback("Error", None, f"Cleanup failed: {str(e)}")
+                return
         # clone
         status_callback("Cloning", "Cloning repository...")
         repo = Repo.clone_from(repo_url, user_project_path, depth=1)
@@ -57,11 +65,11 @@ def run_ingestion_for_user(repo_url, user_id, project_id, status_callback):
                 node_id = f"{rel_path}::{unit['name']}"
                 current_hash = generate_footprint(unit["code"])
                 
-                # Check Cache
+                # check if code logic is updated
                 existing = supabase.table("memory_units").select("code_footprint").eq("project_id", project_id).eq("unit_name", node_id).execute()
 
                 if not existing.data or existing.data[0]['code_footprint'] != current_hash:
-                    status_callback("Vectorizing", f"Embedding {unit['name']}...")
+                    status_callback("Updating", f"Logic change detected in {unit['name']}")
                     intel = enrich_block(unit["code"], unit["name"])
                     
                     if intel:
